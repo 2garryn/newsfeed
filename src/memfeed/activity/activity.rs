@@ -6,13 +6,15 @@ use std::io::Write;
 use super::types::*;
 use crate::memfeed::common_types::*;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Activity {
     pub id: ActivityId,
     pub onwer_feed: FeedId,
     pub published: Published,
     pub spec: FilterSpec,
 }
+
+
 
 impl Activity {
     pub fn read_from_store(reader: &mut Read) -> io::Result<Activity> {

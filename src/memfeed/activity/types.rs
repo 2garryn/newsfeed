@@ -5,14 +5,14 @@ use std::io::Write;
 
 use crate::memfeed::common_types::StorageWork;
 
-#[derive(Debug)]
-pub struct ActivityId(u128);
+#[derive(Debug, Copy, Clone)]
+pub struct ActivityId(pub u128);
 
-#[derive(Debug)]
-pub struct Published(u64);
+#[derive(Debug, Copy, Clone)]
+pub struct Published(pub u64);
 
-#[derive(Debug)]
-pub struct FilterSpec(u16);
+#[derive(Debug, Copy, Clone)]
+pub struct FilterSpec(pub u16);
 
 impl StorageWork<ActivityId> for ActivityId {
     fn read_from_store(reader: &mut Read) -> io::Result<ActivityId> {
