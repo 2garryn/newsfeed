@@ -1,0 +1,14 @@
+/home/garry/rust/newsfeed/target/rls/debug/deps/uuid-811d4a068b8bcf53.rmeta: /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/lib.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/core_support/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/builder.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/core_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/std_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/prelude.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/core_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/std_support.rs
+
+/home/garry/rust/newsfeed/target/rls/debug/deps/uuid-811d4a068b8bcf53.d: /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/lib.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/core_support/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/builder.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/mod.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/core_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/std_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/prelude.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/core_support.rs /home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/std_support.rs
+
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/lib.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/mod.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/adapter/core_support/mod.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/builder.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/mod.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/core_support.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/parser/std_support.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/prelude.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/core_support.rs:
+/home/garry/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-0.7.4/src/std_support.rs:

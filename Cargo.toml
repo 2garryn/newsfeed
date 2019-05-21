@@ -1,0 +1,9 @@
+[package]
+name = "newsfeed"
+version = "0.1.0"
+authors = ["Artem Golovinsky <artemgolovinsky@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+uuid = { version = "0.7", features = ["serde", "v4"] }
+chrono = "0.4"
