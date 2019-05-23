@@ -33,4 +33,8 @@ impl Activity {
         self.spec.write_to_store(writer)?;
         Ok(())
     }
+
+    pub fn size() -> u64 {
+        16 + 8 + 2 + 16
+    }
 }
