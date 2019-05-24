@@ -80,7 +80,35 @@ impl ActivityPage {
         self.acts_amount = self.acts_amount + (acts_amount as u64);
         Ok(())
     }
+
+    pub fn get(&self, n: u64) -> Box<Activity> {
+        self.activities[n as usize]
+    }
+
+    pub fn recent(&self) -> Box<Activity> {
+        self.activities[self.activities.len()]
+    }
+
+    pub fn oldest(&self) -> Box<Activity> {
+        self.activities[0]
+    }
+
+    pub fn maybe_contid_here(&self, cont_id: NextContId) -> bool {
+        let recent = self.recent();
+        let oldest = self.oldest();
+        cont_id.published.0 >= oldest.published.0 &&
+        cont_id.published.0 <= recent.published.0
+    }
+
+    pub fn read_older(&self, start_act_id: ActivityId, start_pub: Published, n: u64, acts: Vec<Box<Activity>>) -> u64 {
+        1
+    }
+
+    pub fn read_newer(&self, n: u64, acts: Vec<Box<Activity>>) -> u64 {
+        2
+    }
 }
+
 #[derive(Debug)]
 pub struct Activities {
     pages: Vec<ActivityPage>,
@@ -119,6 +147,30 @@ impl Activities {
         self.add_many(vec!(act))
     }
 
+    pub fn get_feed_start(&self, num: u64, acts: Vec<Box<Activity>>) -> Result<ContId> {
+        if self.pages.len() == 0 {
+            return Ok(None)
+        };
+        let recent_act: Box<Activity> = self.pages[0].last();
+        let cont_id: NextContId = NextContId::new(recent_act, 0);
+        self.get_feed_next(cont_id, num, acts)
+    }
+
+    pub fn get_feed_older(&self, cont_id: NextContId, num: u64, acts: Vec<Box<Activity>>) -> Result<ContId> {
+        let start_act_id = cont_id.activity_id;
+        let start_publ = cont_id.published;
+        let mut num_read = num;
+        for page in &self.pages{
+            if page.maybe_contid_here(cont_id) {
+                let received = page.read_older(start_act_id, start_publ, acts);
+                
+
+            }
+        }
+    }
+
+
+
     fn create_and_add(&mut self, acts: Vec<Activity>) -> Result<()> {
         let p = feed_path(self.owner_id, ACTIVITIES_PATH);
         let mut f = OpenOptions::new()
@@ -142,6 +194,29 @@ impl Activities {
 
 }
 
+
+type ContId  = Option<NextContId>;
+
+pub struct NextContId {
+    activity_id: ActivityId,
+    published: Published,
+    page_n: u64
+}
+
+impl NextContId {
+    pub fn new(act: Box<Activity>, page_n: u64) -> NextContId {
+        NextContId{
+            activity_id: act.id,
+            published: act.published,
+            page_n: page_n
+        }
+    }
+}
+
+
+
+
+/*
 #[derive(Debug, Copy, Clone)]
 pub struct ContId {
     activity_id: ActivityId,
@@ -160,7 +235,7 @@ impl ContId {
         }
     }
 }
-
+*/
 
 
 
