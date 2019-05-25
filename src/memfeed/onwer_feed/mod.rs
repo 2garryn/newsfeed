@@ -100,6 +100,14 @@ impl ActivityPage {
         cont_id.published.0 <= recent.published.0
     }
 
+    pub fn is_oldest_page(&self) -> bool {
+        self.f_start == 0
+    }
+
+    pub fn get_start_offset(&self) -> u64 {
+        self.f_start
+    }
+
     pub fn read_older(&self, start_act_id: ActivityId, start_pub: Published, n: u64, acts: Vec<Box<Activity>>) -> u64 {
         1
     }
@@ -110,35 +118,39 @@ impl ActivityPage {
 }
 
 #[derive(Debug)]
-pub struct Activities {
+pub struct ActivityPages {
     pages: Vec<ActivityPage>,
-    owner_id: FeedId
+    owner_id: FeedId,
+    f: Option<File>
 }
-impl Activities {
-    pub fn load_from_file(owner_id: FeedId) -> Result<(Activities)> {
+impl ActivityPages {
+    pub fn load_from_file(owner_id: FeedId) -> Result<(ActivityPages)> {
         let p = feed_path(owner_id, ACTIVITIES_PATH);
         let prev_page_start = match fs::metadata(&p) {
             Ok(metadata) => metadata.len(),
             Err(ref e) if e.kind() == ErrorKind::NotFound => 
-                return Ok(Activities{
+                return Ok(ActivityPages{
                     pages: Vec::with_capacity(0),
-                    owner_id: owner_id
+                    owner_id: owner_id,
+                    f: None
                 }),
             Err(e) => return Err(e)
         };
-        let mut f = OpenOptions::new().read(true).open(&p)?;
+        let mut f = OpenOptions::new().read(true).append(true).open(&p)?;
         let mut pages: Vec<ActivityPage> = Vec::with_capacity(1);
         let page = ActivityPage::read_from_position(prev_page_start, &mut f, CHUNK_SIZE)?;
         pages.push(page);
-        Ok(Activities{
+        Ok(ActivityPages{
             pages: pages,
-            owner_id: owner_id
+            owner_id: owner_id,
+            f: Some(f.try_clone()?)
         })
     }
+
     pub fn add_many(&mut self, acts: Vec<Activity>) -> Result<()> {
         match self.pages.len() {
             0 => self.create_and_add(acts)?,
-            _ => self.just_add_many(acts)?
+            _ => self.pages[0].add_many(&mut self.f.unwrap(), acts)?
         };
         Ok(())
     }
@@ -147,29 +159,23 @@ impl Activities {
         self.add_many(vec!(act))
     }
 
-    pub fn get_feed_start(&self, num: u64, acts: Vec<Box<Activity>>) -> Result<ContId> {
+    pub fn get_starting_from(&mut self, cont_id: NextContId, n: u64, acts: ActivityCell) -> Result<u64> {
+        
+    }
+
+    fn load_next_page(&mut self) -> Result<bool> {
         if self.pages.len() == 0 {
-            return Ok(None)
+            return Ok(false)
         };
-        let recent_act: Box<Activity> = self.pages[0].last();
-        let cont_id: NextContId = NextContId::new(recent_act, 0);
-        self.get_feed_next(cont_id, num, acts)
+        let last_page = self.pages.last().unwrap();
+        if last_page.is_oldest_page() {
+            return Ok(false)
+        };
+        let prev_offset = last_page.get_start_offset();
+        let new_page = ActivityPage::read_from_position(prev_offset, &mut self.f.unwrap(), CHUNK_SIZE)?;
+        self.pages.push(new_page);
+        Ok(true)
     }
-
-    pub fn get_feed_older(&self, cont_id: NextContId, num: u64, acts: Vec<Box<Activity>>) -> Result<ContId> {
-        let start_act_id = cont_id.activity_id;
-        let start_publ = cont_id.published;
-        let mut num_read = num;
-        for page in &self.pages{
-            if page.maybe_contid_here(cont_id) {
-                let received = page.read_older(start_act_id, start_publ, acts);
-                
-
-            }
-        }
-    }
-
-
 
     fn create_and_add(&mut self, acts: Vec<Activity>) -> Result<()> {
         let p = feed_path(self.owner_id, ACTIVITIES_PATH);
@@ -179,19 +185,9 @@ impl Activities {
             .open(&p)?;
         let page = ActivityPage::create_file(&mut f, acts)?;
         self.pages.push(page);
+        self.f = Some(f.try_clone()?);
         Ok(())
     }
-
-    fn just_add_many(&mut self, acts: Vec<Activity>) -> Result<()> {
-        let p = feed_path(self.owner_id, ACTIVITIES_PATH);
-        let mut f = OpenOptions::new()
-            .append(true)
-            .open(&p)?;
-        self.pages[0].add_many(&mut f, acts)?;
-        Ok(())
-    }
-
-
 }
 
 
