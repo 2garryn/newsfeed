@@ -82,18 +82,18 @@ impl ActivityPage {
     }
 
     pub fn get(&self, n: u64) -> Box<Activity> {
-        self.activities[n as usize]
+        self.activities[n as usize].clone()
     }
 
     pub fn recent(&self) -> Box<Activity> {
-        self.activities[self.activities.len()]
+        self.activities.last().unwrap().clone()
     }
 
     pub fn oldest(&self) -> Box<Activity> {
-        self.activities[0]
+        self.activities.first().unwrap().clone()
     }
 
-    pub fn maybe_contid_here(&self, cont_id: NextContId) -> bool {
+    pub fn maybe_contid_here(&self, cont_id: &NextContId) -> bool {
         let recent = self.recent();
         let oldest = self.oldest();
         cont_id.published.0 >= oldest.published.0 &&
@@ -106,6 +106,10 @@ impl ActivityPage {
 
     pub fn get_start_offset(&self) -> u64 {
         self.f_start
+    }
+
+    pub fn len(&self) -> usize {
+        self.activities.len()
     }
 
     pub fn read_older(&self, start_act_id: ActivityId, start_pub: Published, n: u64, acts: Vec<Box<Activity>>) -> u64 {
@@ -150,7 +154,13 @@ impl ActivityPages {
     pub fn add_many(&mut self, acts: Vec<Activity>) -> Result<()> {
         match self.pages.len() {
             0 => self.create_and_add(acts)?,
-            _ => self.pages[0].add_many(&mut self.f.unwrap(), acts)?
+            _ => {
+                let mut new_f = match &self.f {
+                    Some(myf) => myf.try_clone()?,
+                    None => panic!()
+                };
+                self.pages[0].add_many(&mut new_f , acts)?
+            }
         };
         Ok(())
     }
@@ -159,9 +169,60 @@ impl ActivityPages {
         self.add_many(vec!(act))
     }
 
-    pub fn get_starting_from(&mut self, cont_id: NextContId, n: u64, acts: ActivityCell) -> Result<u64> {
-        
+    pub fn get_feed_start(&mut self, limit: u64, acts: &mut ActivityCell) -> Result<Option<NextContId>> {
+        Ok(self.pages.first().and_then(|page| {
+            acts.push(page.recent());
+            Some(NextContId::new(page.recent()))
+        }))
     }
+
+    pub fn get_starting_from(&mut self, cont_id: NextContId, n: u64, acts: ActivityCell) -> Result<u64> {
+        match self.find_start_activity(&cont_id)? {
+            Some((p_n, act_n)) => {
+                println!("Page number {} activity number {}", p_n, act_n);
+                Ok(0)
+            },
+            None => {
+                println!("Nothing found");
+                Ok(0)
+            }
+        }
+    }
+
+    pub fn find_start_activity(&mut self, cont_id: &NextContId) -> Result<Option<(u64, u64)>> {
+        let mut l = self.pages.len() as u64;
+        let mut i = 0;
+        loop {  
+            if let Some(n) = self.find_start_activity_on_page(cont_id, i as usize) {
+                println!("Page number {} activity number {}", i, n);
+                return Ok(Some((i, n)))
+            }
+            i = i + 1;
+            if i == l {
+                if self.load_next_page()? {
+                    l = l + 1;
+                } else {
+                    break;
+                }
+            }
+        }
+        Ok(None)
+
+    }
+
+    fn find_start_activity_on_page(&self, cont_id: &NextContId, page_n: usize) -> Option<u64> {
+        if self.pages[page_n].maybe_contid_here(&cont_id) {
+            let page_l = self.pages[page_n].len() as u64;
+            for j in 0..page_l {
+                if self.pages[page_n].get(j).published.0 >= cont_id.published.0 && 
+                    self.pages[page_n].get(j).id.0 >= cont_id.activity_id.0 {
+                        return Some(j);
+                }
+            }
+        }
+        None
+    }
+
 
     fn load_next_page(&mut self) -> Result<bool> {
         if self.pages.len() == 0 {
@@ -172,7 +233,11 @@ impl ActivityPages {
             return Ok(false)
         };
         let prev_offset = last_page.get_start_offset();
-        let new_page = ActivityPage::read_from_position(prev_offset, &mut self.f.unwrap(), CHUNK_SIZE)?;
+        let mut new_f = match &self.f {
+            Some(myf) => myf.try_clone()?,
+            None => panic!()
+        };
+        let new_page = ActivityPage::read_from_position(prev_offset, &mut new_f, CHUNK_SIZE)?;
         self.pages.push(new_page);
         Ok(true)
     }
@@ -193,49 +258,20 @@ impl ActivityPages {
 
 type ContId  = Option<NextContId>;
 
+#[derive(Debug, Copy, Clone)]
 pub struct NextContId {
     activity_id: ActivityId,
-    published: Published,
-    page_n: u64
+    published: Published
 }
 
 impl NextContId {
-    pub fn new(act: Box<Activity>, page_n: u64) -> NextContId {
+    pub fn new(act: Box<Activity>) -> NextContId {
         NextContId{
             activity_id: act.id,
-            published: act.published,
-            page_n: page_n
+            published: act.published
         }
     }
 }
-
-
-
-
-/*
-#[derive(Debug, Copy, Clone)]
-pub struct ContId {
-    activity_id: ActivityId,
-    published: Published,
-    finished: bool,
-    position: usize
-}
-
-impl ContId {
-    pub fn new(activity: Activity, finished: bool, position: usize) -> ContId {
-        ContId{
-            activity_id: activity.id,
-            published: activity.published,
-            finished: finished,
-            position: position
-        }
-    }
-}
-*/
-
-
-
-
 
 fn feed_path(feed_id: FeedId, path: &'static str) -> PathBuf {
     Path::new(path).join((feed_id.0).to_string())

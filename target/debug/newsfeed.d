@@ -1,1 +1,0 @@
-/home/garry/rust/newsfeed/target/debug/newsfeed: /home/garry/rust/newsfeed/src/main.rs /home/garry/rust/newsfeed/src/memfeed/activity/activity.rs /home/garry/rust/newsfeed/src/memfeed/activity/mod.rs /home/garry/rust/newsfeed/src/memfeed/activity/types.rs /home/garry/rust/newsfeed/src/memfeed/common_types/mod.rs /home/garry/rust/newsfeed/src/memfeed/mod.rs
