@@ -3,7 +3,6 @@ use std::fs::{File, OpenOptions, Metadata};
 use std::io::{Result, Seek, ErrorKind, SeekFrom};
 use std::ops::Drop;
 use crate::store::{
-    ActivityStorage, 
     RelativeRequest, 
     PaginationRequest,
     ActivityList,
@@ -11,8 +10,44 @@ use crate::store::{
 };
 use crate::activity::{FeedId, Activity, ActivityId};
 
-mod chunk;
-use chunk::Chunk;
+mod page_index;
+mod pages;
+mod wal;
+use page_index::PageIndex;
+use pages::Pages;
+use wal::Wal;
+
+pub struct LStore {
+    index: PageIndex,
+    pages: Pages,
+    wal: Wal,
+    feed_id: FeedId
+}
+
+
+impl LStore {
+    pub fn new(feed_id: FeedId, storage_path: &Path) -> Result<LStore> {
+        let mut path = PathBuf::new().join(storage_path).join(feed_id.to_string());
+        Ok(LStore {
+            index: PageIndex::new(feed_id, &path)?,
+            pages: Pages::new(feed_id, &path)?,
+            wal: Wal::new(&path)?,
+            feed_id: feed_id
+        })
+    }
+
+    pub fn put_activity(&self, activity: &Activity) -> Result<()> {
+        self.wal.put(activity)?;
+
+        Ok(())
+    }
+}
+
+
+
+
+/*
+
 
 pub struct ChunkedStore {
     feed_path: PathBuf,
@@ -82,4 +117,5 @@ impl ChunkedStore {
 
 }
 
+*/
 

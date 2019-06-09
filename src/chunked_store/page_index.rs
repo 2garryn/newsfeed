@@ -1,15 +1,13 @@
 
 use crate::activity::{FeedId, Activity, ActivityId};
-
+use std::path::{Path, PathBuf};
 use std::io::{Read, Result};
 
 pub struct PageIndex {
-    first_id: ActivityId,
-    n_acts: u32
 }
 
 impl PageIndex {
-    pub fn new(reader: &mut R) -> Result<PageIndex> {
-        PageIndex{}
+    pub fn new(feed_id: FeedId, storage_path: &Path) -> Result<PageIndex> {
+        Ok(PageIndex{})
     }
 }

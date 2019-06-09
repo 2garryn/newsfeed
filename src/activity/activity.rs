@@ -31,7 +31,7 @@ pub struct Activity {
 
 
 impl StoreCall<Activity> for Activity {
-    fn read_from_store(reader: &mut Read) -> Result<Activity> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<Activity> {
         Ok(Activity {
             id: ActivityId::read_from_store(reader)?,
             onwer_feed: FeedId::read_from_store(reader)?,
@@ -40,7 +40,7 @@ impl StoreCall<Activity> for Activity {
             filter: Filter::read_from_store(reader)?,
         })
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         self.id.write_to_store(writer)?;
         self.onwer_feed.write_to_store(writer)?;
         self.actor.write_to_store(writer)?;
@@ -58,12 +58,12 @@ impl StoreCall<Activity> for Activity {
 }
 
 impl StoreCall<ActivityId> for ActivityId {
-    fn read_from_store(reader: &mut Read) -> Result<ActivityId> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<ActivityId> {
         let mut id_b: [u8; 16] = [0; 16];
         reader.read(&mut id_b)?;
         Ok(ActivityId(u128::from_be_bytes(id_b)))
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         writer.write(&self.0.to_be_bytes())?;
         Ok(())
     }
@@ -73,12 +73,12 @@ impl StoreCall<ActivityId> for ActivityId {
 }
 
 impl StoreCall<FeedId> for FeedId {
-    fn read_from_store(reader: &mut Read) -> Result<FeedId> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<FeedId> {
         let mut id_b: [u8; 16] = [0; 16];
         reader.read(&mut id_b)?;
         Ok(FeedId(u128::from_be_bytes(id_b)))
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         writer.write(&self.0.to_be_bytes())?;
         Ok(())
     }
@@ -88,12 +88,12 @@ impl StoreCall<FeedId> for FeedId {
 }
 
 impl StoreCall<Actor> for Actor {
-    fn read_from_store(reader: &mut Read) -> Result<Actor> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<Actor> {
         let mut id_b: [u8; 16] = [0; 16];
         reader.read(&mut id_b)?;
         Ok(Actor(u128::from_be_bytes(id_b)))
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         writer.write(&self.0.to_be_bytes())?;
         Ok(())
     }
@@ -103,12 +103,12 @@ impl StoreCall<Actor> for Actor {
 }
 
 impl StoreCall<Published> for Published {
-    fn read_from_store(reader: &mut Read) -> Result<Published> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<Published> {
         let mut published_b: [u8; 8] = [0; 8];
         reader.read(&mut published_b)?;
         Ok(Published(u64::from_be_bytes(published_b)))
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         writer.write(&self.0.to_be_bytes())?;
         Ok(())
     }
@@ -118,12 +118,12 @@ impl StoreCall<Published> for Published {
 }
 
 impl StoreCall<Filter> for Filter {
-    fn read_from_store(reader: &mut Read) -> Result<Filter> {
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<Filter> {
         let mut spec_b: [u8; 2] = [0; 2];
         reader.read(&mut spec_b)?;
         Ok(Filter(u16::from_be_bytes(spec_b)))
     }
-    fn write_to_store(&self, writer: &mut Write) -> Result<()> {
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()> {
         writer.write(&self.0.to_be_bytes())?;
         Ok(())
     }

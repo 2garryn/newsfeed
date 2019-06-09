@@ -19,12 +19,12 @@ pub struct RelativeRequest{
 }
 
 pub trait StoreCall<T> {
-    fn read_from_store(reader: &mut Read) -> Result<T>;
-    fn write_to_store(&self, writer: &mut Write) -> Result<()>;
+    fn read_from_store<R: Read>(reader: &mut R) -> Result<T>;
+    fn write_to_store<W: Write>(&self, writer: &mut W) -> Result<()>;
     fn byte_size() -> u8;
 }
 
-
+/*
 pub trait ActivityStorage<ImplStorage> {
     fn new(feed_id: FeedId, storage_path: &String) -> ImplStorage;
 
@@ -41,3 +41,4 @@ pub trait ActivityStorage<ImplStorage> {
     fn lt(&self, request: RelativeRequest, acts: &mut ActivityList) -> Result<()>;
 
 }
+*/
